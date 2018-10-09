@@ -25,6 +25,8 @@ import java.util.ArrayList
 import android.Manifest.permission.READ_CONTACTS
 
 import kotlinx.android.synthetic.main.activity_login.*
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.toast
 
 /**
  * A login screen that offers login via email/password.
@@ -112,18 +114,22 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
         // Check for a valid password, if the user entered one.
         if (!TextUtils.isEmpty(passwordStr) && !isPasswordValid(passwordStr)) {
-            password.error = getString(R.string.error_invalid_password)
+            alerta(getString(R.string.error_invalid_password))
             focusView = password
             cancel = true
-        }
+        } else
 
         // Check for a valid email address.
         if (TextUtils.isEmpty(emailStr)) {
-            email.error = getString(R.string.error_field_required)
+            alerta(getString(R.string.error_email_required))
             focusView = email
             cancel = true
+        } else if (TextUtils.isEmpty(passwordStr)) {
+            alerta(getString(R.string.error_password_required))
+            focusView = password
+            cancel = true
         } else if (!isEmailValid(emailStr)) {
-            email.error = getString(R.string.error_invalid_email)
+            alerta(getString(R.string.error_invalid_email))
             focusView = email
             cancel = true
         }
@@ -141,6 +147,13 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         }
     }
 
+    private fun alerta(erro: String) {
+        alert(erro) {
+            title = "Erro"
+            yesButton{toast("Ok")}
+        }.show()
+    }
+
     private fun isEmailValid(email: String): Boolean {
         //TODO: Replace this with your own logic
         return email.contains("@")
@@ -148,7 +161,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
     private fun isPasswordValid(password: String): Boolean {
         //TODO: Replace this with your own logic
-        return password.length > 4
+        return password.length > 5
     }
 
     /**
@@ -246,7 +259,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
             try {
                 // Simulate network access.
-                Thread.sleep(2000)
+                Thread.sleep(100)
             } catch (e: InterruptedException) {
                 return false
             }
@@ -258,7 +271,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
                         // Account exists, return true if the password matches.
                         it[1] == mPassword
                     }
-                    ?: true
+                    ?: false
         }
 
         override fun onPostExecute(success: Boolean?) {
@@ -266,9 +279,9 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             showProgress(false)
 
             if (success!!) {
-                finish()
+                setContentView(R.layout.activity_home)
             } else {
-                password.error = getString(R.string.error_incorrect_password)
+                alerta(getString(R.string.error_incorrect_password))
                 password.requestFocus()
             }
         }
@@ -290,6 +303,6 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
          * A dummy authentication store containing known user names and passwords.
          * TODO: remove after connecting to a real authentication system.
          */
-        private val DUMMY_CREDENTIALS = arrayOf("foo@example.com:hello", "bar@example.com:world")
+        private val DUMMY_CREDENTIALS = arrayOf("valido@maximasistemas.com.br:123456")
     }
 }
